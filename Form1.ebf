@@ -1,0 +1,312 @@
+VERSION 5.00
+Object = "{532C2BF5-6B55-11D1-9AA5-00C04FAD5AEC}#1.0#0"; "MSCEGRID.DLL"
+Begin VB.Form Form1 
+   Appearance      =   0  'Flat
+   BackColor       =   &H80000005&
+   Caption         =   "Timer"
+   ClientHeight    =   3510
+   ClientLeft      =   60
+   ClientTop       =   840
+   ClientWidth     =   3480
+   ForeColor       =   &H80000008&
+   ScaleHeight     =   3510
+   ScaleWidth      =   3480
+   ShowOK          =   -1  'True
+   Begin GRIDLibCtl.GridCtrl gridobject 
+      Height          =   255
+      Left            =   360
+      TabIndex        =   4
+      Top             =   2160
+      Width           =   2730
+      _cx             =   4815
+      _cy             =   450
+      BackColor       =   16777215
+      BackColorBkg    =   16777215
+      BackColorSel    =   12937777
+      Cols            =   60
+      FillStyle       =   0
+      FocusRect       =   1
+      ForeColor       =   0
+      ForeColorSel    =   16777215
+      GridColor       =   12632256
+      GridLines       =   1
+      GridLineWidth   =   1
+      HighLight       =   1
+      Redraw          =   -1  'True
+      RowHeightMin    =   0
+      Rows            =   1
+      ScrollBars      =   0
+      ScrollTrack     =   0   'False
+      SelectionMode   =   0
+      TextStyle       =   0
+      WordWrap        =   0   'False
+      Enabled         =   -1  'True
+   End
+   Begin VBCE.CommandButton Reset_Button 
+      Height          =   375
+      Left            =   2360
+      TabIndex        =   3
+      Top             =   2880
+      Width           =   735
+      _cx             =   1296
+      _cy             =   661
+      BackColor       =   12632256
+      Caption         =   "RESET"
+      Enabled         =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Tahoma"
+         Size            =   8.25
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Style           =   0
+   End
+   Begin VBCE.CommandButton Stop_Button 
+      Height          =   375
+      Left            =   1350
+      TabIndex        =   2
+      Top             =   2880
+      Width           =   735
+      _cx             =   1296
+      _cy             =   661
+      BackColor       =   12632256
+      Caption         =   "STOP"
+      Enabled         =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Tahoma"
+         Size            =   8.25
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Style           =   0
+   End
+   Begin VBCE.CommandButton Start_Button 
+      Height          =   375
+      Left            =   360
+      TabIndex        =   1
+      Top             =   2880
+      Width           =   735
+      _cx             =   1296
+      _cy             =   661
+      BackColor       =   12632256
+      Caption         =   "START"
+      Enabled         =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Tahoma"
+         Size            =   8.25
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Style           =   0
+   End
+   Begin VBCE.Label Timer_Display 
+      Height          =   615
+      Left            =   0
+      TabIndex        =   0
+      Top             =   720
+      Width           =   3495
+      _cx             =   6165
+      _cy             =   1085
+      AutoSize        =   0   'False
+      BackColor       =   -2147483643
+      BackStyle       =   1
+      BorderStyle     =   0
+      Caption         =   "00 : 00 : 00"
+      Enabled         =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Verdana"
+         Size            =   26.25
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ForeColor       =   -2147483640
+      Alignment       =   2
+      UseMnemonic     =   -1  'True
+      WordWrap        =   0   'False
+   End
+   Begin VBCE.Timer Timer1 
+      Left            =   1560
+      Top             =   1560
+      _cx             =   847
+      _cy             =   847
+      Enabled         =   0   'False
+      Interval        =   949
+   End
+End
+Attribute VB_Name = "Form1"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = True
+Attribute VB_Exposed = False
+' Timer                                                             Version 1.00
+
+' Compliments of Electroanalytical Technology Ltd                      July 2002
+' Written by Jonathan Burnett, Technical Director
+
+'-------------------------------------------------------------------------------
+
+Option Explicit
+Dim x As Long
+Dim m As Integer        ' minutes
+Dim h As Integer        ' hours
+Dim s As Integer        ' seconds
+Dim h2 As Integer       ' column width
+Dim x2 As Integer       ' column index number
+Dim n As Integer        ' timer counter
+
+Private Sub Start_Button_Click()
+Timer1.Enabled = True
+End Sub
+
+Private Sub Stop_Button_Click()
+Timer1.Enabled = False
+End Sub
+
+Private Sub Reset_Button_Click()
+Timer_Display.Caption = "00 : 00 : 00"
+m = 0
+h = 0
+s = 0
+n = 0
+    For x2 = 0 To 59
+        gridobject.Col = x2
+        gridobject.CellBackColor = vbWhite
+    Next x2
+    x2 = 0
+End Sub
+
+Private Sub Form_Load()
+m = 0
+h = 0
+s = 0
+n = 0
+
+'This sizes the columns in the grid.
+Dim h2 As Integer
+
+For h2 = 0 To 59
+    gridobject.ColWidth(h2) = 50
+Next h2
+
+End Sub
+
+Private Sub Timer1_Timer()
+
+If s = 0 Then
+End If
+If h < 10 Then
+If m = 60 Then
+    m = 0
+    h = h + 1
+    If s = 59 Then
+            Timer_Display.Caption = "0" & h & " : 0" & m & " : " & s
+            m = m + 1
+            s = 0
+    ElseIf s < 10 Then
+            Timer_Display.Caption = "0" & h & " : 0" & m & " : 0" & s
+            s = s + 1
+        Else
+            Timer_Display.Caption = "0" & h & " : 0" & m & " : " & s
+            s = s + 1
+    End If
+ElseIf m < 10 Then
+    If s = 59 Then
+            Timer_Display.Caption = "0" & h & " : 0" & m & " : " & s
+            m = m + 1
+            s = 0
+    ElseIf s < 10 Then
+            Timer_Display.Caption = "0" & h & " : 0" & m & " : 0" & s
+            s = s + 1
+        Else
+            Timer_Display.Caption = "0" & h & " : 0" & m & " : " & s
+            s = s + 1
+    End If
+Else
+    If s = 59 Then
+            Timer_Display.Caption = "0" & h & " : " & m & " : " & s
+            m = m + 1
+            s = 0
+    ElseIf s < 10 Then
+            Timer_Display.Caption = "0" & h & " : " & m & " : 0" & s
+            s = s + 1
+        Else
+            Timer_Display.Caption = "0" & h & " : " & m & " : " & s
+            s = s + 1
+    End If
+End If
+Else
+If m = 60 Then
+    m = 0
+    h = h + 1
+    If s = 59 Then
+            Timer_Display.Caption = h & " : 0" & m & " : " & s
+            m = m + 1
+            s = 0
+    ElseIf s < 10 Then
+            Timer_Display.Caption = h & " : 0" & m & " : 0" & s
+            s = s + 1
+        Else
+            Timer_Display.Caption = h & " : 0" & m & " : " & s
+            s = s + 1
+    End If
+ElseIf m < 10 Then
+    If s = 59 Then
+            Timer_Display.Caption = h & " : 0" & m & " : " & s
+            m = m + 1
+            s = 0
+    ElseIf s < 10 Then
+            Timer_Display.Caption = h & " : 0" & m & " : 0" & s
+            s = s + 1
+        Else
+            Timer_Display.Caption = h & " : 0" & m & " : " & s
+            s = s + 1
+    End If
+Else
+    If s = 59 Then
+            Timer_Display.Caption = h & " : " & m & " : " & s
+            m = m + 1
+            s = 0
+    ElseIf s < 10 Then
+            Timer_Display.Caption = h & " : " & m & " : 0" & s
+            s = s + 1
+        Else
+            Timer_Display.Caption = h & " : " & m & " : " & s
+            s = s + 1
+    End If
+End If
+End If
+
+If n > 0 Then
+    gridobject.Col = x2
+    x2 = x2 + 1
+    gridobject.CellBackColor = vbRed
+End If
+
+    If x2 > 59 Then
+        For x2 = 0 To 59
+        gridobject.Col = x2
+        gridobject.CellBackColor = vbWhite
+        Next x2
+        x2 = 0
+    End If
+
+n = n + 1
+
+End Sub
+
+Private Sub Form_OKClick()
+    App.End
+End Sub
+
